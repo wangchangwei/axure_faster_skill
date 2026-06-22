@@ -1,0 +1,35 @@
+<div class="container fade-in">
+    <div class="card" style="max-width: 400px; margin: 80px auto;">
+        <h2 style="margin-top: 0; color: var(--primary-color); text-align: center; margin-bottom: 24px;">系统登录</h2>
+        
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; color: var(--text-main); font-size: 14px; font-weight: bold;">用户名</label>
+            <input id="input-username" data-task-id="A1" type="text" placeholder="请输入用户名" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+        </div>
+        
+        <div style="margin-bottom: 24px;">
+            <label style="display: block; margin-bottom: 8px; color: var(--text-main); font-size: 14px; font-weight: bold;">密码</label>
+            <input id="input-password" data-task-id="A2" type="password" placeholder="请输入密码" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+        </div>
+        
+        <!-- 使用 HTMX 直接请求 home.html，并更新主框架。同时同步更新导航栏的高亮状态 -->
+        <button id="btn-login-submit" data-task-id="A3" class="btn" style="width: 100%; font-size: 16px; padding: 12px;" 
+                hx-get="home.html" 
+                hx-target="#main-frame" 
+                hx-swap="innerHTML"
+                onclick="document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active')); const homeLink = document.querySelector('a[hx-get=\'home.html\']'); if(homeLink) homeLink.classList.add('active');">
+            登录
+        </button>
+    </div>
+</div>
+
+<!-- 页面组件说明便签 -->
+<div class="sticky-note" data-target="input-username">
+    <h4>用户名输入框</h4>
+    <p>用于输入注册的账户名称，当前原型无需真实校验。</p>
+</div>
+
+<div class="sticky-note" data-target="btn-login-submit">
+    <h4>登录按钮</h4>
+    <p>点击后模拟登录成功，直接无刷新跳转进入系统首页。</p>
+</div>

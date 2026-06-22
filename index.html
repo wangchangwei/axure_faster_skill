@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Frontend Prototype Scaffold</title>
+    <!-- 1. 核心依赖：HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- 2. 原生设计系统 (Vanilla CSS Tokens) -->
+    <style>
+        :root { 
+            --primary-color: #0052cc;
+            --primary-light: #e6f0ff;
+            --surface-bg: #f4f5f7; 
+            --surface-card: #ffffff; 
+            --border-color: #dfe1e6; 
+            --text-main: #172b4d; 
+            --text-muted: #5e6c84; 
+            --success: #00875a; 
+            --warning: #ff991f; 
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; padding: 0; background: var(--surface-bg); color: var(--text-main); 
+        }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .card { 
+            background: var(--surface-card); border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 24px; margin-bottom: 24px; 
+        }
+        .btn { 
+            background: var(--primary-color); color: white; border: none; 
+            padding: 10px 20px; border-radius: 4px; cursor: pointer; 
+            font-size: 14px; font-weight: bold; transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            background: var(--surface-card);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar .brand {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 8px;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            background: var(--surface-bg);
+        }
+        .nav-links {
+            display: flex;
+            gap: 16px;
+            margin-left: 32px;
+            flex-grow: 1;
+        }
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: var(--primary-light);
+            font-weight: bold;
+        }
+        .sticky-note {
+            background-color: #fff9c4;
+            border-left: 5px solid #fbc02d;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            font-family: "Comic Sans MS", "Chalkboard SE", sans-serif;
+            transition: opacity 0.3s ease;
+        }
+        .sticky-note h4 {
+            margin-top: 0;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #f57f17;
+            border-bottom: 1px dashed #fbc02d;
+            padding-bottom: 4px;
+        }
+        .sticky-note p {
+            margin: 0;
+        }
+        .notes-container {
+            position: fixed;
+            top: 80px;
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 90;
+        }
+        #notes-container-left {
+            left: 30px;
+        }
+        #notes-container-right {
+            right: 30px;
+        }
+    </style>
+</head>
+<body>
+    <nav id="top-navbar" class="navbar">
+        <div class="brand">Prototype Scaffold</div>
+        <div class="nav-links" id="nav-pages" data-has-note="true">
+            <!-- Agent新增页面时，需要在此处添加对应的导航链接 -->
+            <a href="#" class="nav-link active" hx-get="home.html" hx-target="#main-frame" hx-swap="innerHTML" onclick="document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active')); this.classList.add('active');">首页</a>
+            <a href="#" class="nav-link" hx-get="login.html" hx-target="#main-frame" hx-swap="innerHTML" onclick="document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active')); this.classList.add('active');">登录</a>
+        </div>
+        <div class="nav-actions">
+            <button class="btn-outline" onclick="const cl = document.getElementById('notes-container-left'); const cr = document.getElementById('notes-container-right'); if(cl && cr) { const isHidden = cl.style.display === 'none'; cl.style.display = isHidden ? 'flex' : 'none'; cr.style.display = isHidden ? 'flex' : 'none'; if(window.drawNoteLines) drawNoteLines(); }">显示/隐藏所有便签</button>
+            <button class="btn-outline" onclick="document.getElementById('top-navbar').style.display = 'none'; if(window.drawNoteLines) drawNoteLines();">隐藏顶部导航栏</button>
+        </div>
+    </nav>
+    <div id="main-frame">
+        <div class="container">
+            <div class="card">
+                <h1 style="margin-top: 0; color: var(--primary-color);">AI Frontend Prototype Scaffold</h1>
+                <p style="color: var(--text-muted); line-height: 1.6;">
+                    这是一个专为 AI 编程助手打造的极简原型脚手架。它剔除了繁重的工程化构建，仅依赖原生 HTML/CSS 和 HTMX，帮助 AI 在几秒钟内生成带有状态流转的高保真交互页面。
+                </p>
+                <hr style="border:0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+                
+
+            </div>
+        </div>
+        
+
+    </div>
+    
+    <!-- 统一存放所有便签的容器 (分左右) -->
+    <div id="notes-container-left" class="notes-container"></div>
+    <div id="notes-container-right" class="notes-container"></div>
+    
+    <!-- 悬浮提示框，用于显示组件 ID -->
+    <div id="component-id-tooltip" style="position: fixed; background: #172b4d; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 12px; pointer-events: none; z-index: 10000; opacity: 0; transition: opacity 0.1s; font-family: monospace; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
+    
+    <!-- 用于绘制连接虚线的 SVG 层 -->
+    <svg id="note-lines" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 85;"></svg>
+
+    <script>
+        function organizeNotes() {
+            const leftContainer = document.getElementById('notes-container-left');
+            const rightContainer = document.getElementById('notes-container-right');
+            if(!leftContainer || !rightContainer) return;
+            
+            // 找到所有不在 container 里的便签并移动进去
+            const strayNotes = document.querySelectorAll('#main-frame .sticky-note');
+            strayNotes.forEach(note => {
+                const targetId = note.getAttribute('data-target');
+                const target = targetId ? document.getElementById(targetId) : null;
+                
+                if (target) {
+                    const rect = target.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    // 如果组件在左半屏，放左侧容器；否则放右侧容器
+                    if (centerX < window.innerWidth / 2) {
+                        leftContainer.appendChild(note);
+                    } else {
+                        rightContainer.appendChild(note);
+                    }
+                } else {
+                    rightContainer.appendChild(note);
+                }
+            });
+        }
+
+        function drawNoteLines() {
+            const svg = document.getElementById('note-lines');
+            if(!svg) return;
+            svg.innerHTML = ''; // 清空已有的线
+            
+            const leftContainer = document.getElementById('notes-container-left');
+            const rightContainer = document.getElementById('notes-container-right');
+            if (!leftContainer || !rightContainer || leftContainer.style.display === 'none') return;
+            
+            const notes = document.querySelectorAll('.sticky-note');
+            
+            notes.forEach(note => {
+                const targetId = note.getAttribute('data-target');
+                if (!targetId) return;
+                
+                const target = document.getElementById(targetId);
+                if (!target) return;
+                
+                const targetRect = target.getBoundingClientRect();
+                const noteRect = note.getBoundingClientRect();
+                
+                if (targetRect.width === 0 || targetRect.height === 0 || noteRect.width === 0) return;
+                
+                // 将组件上的任务 ID 显示到便签标题中
+                const taskId = target.getAttribute('data-task-id');
+                if (taskId && !note.querySelector('.task-id-badge')) {
+                    const badge = document.createElement('span');
+                    badge.className = 'task-id-badge';
+                    badge.textContent = taskId;
+                    badge.style.cssText = 'display: inline-block; background: #172b4d; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 6px; vertical-align: middle; line-height: 1;';
+                    const h4 = note.querySelector('h4');
+                    if (h4) h4.insertBefore(badge, h4.firstChild);
+                }
+                
+                const isLeftNote = note.closest('#notes-container-left') !== null;
+                let startX, startY, endX, endY;
+                
+                if (isLeftNote) {
+                    // 左侧便签：连线从组件左侧到便签右侧
+                    startX = targetRect.left;
+                    startY = targetRect.top + targetRect.height / 2;
+                    endX = noteRect.right;
+                    endY = noteRect.top + 20;
+                } else {
+                    // 右侧便签：连线从组件右侧到便签左侧
+                    startX = targetRect.right;
+                    startY = targetRect.top + targetRect.height / 2;
+                    endX = noteRect.left; 
+                    endY = noteRect.top + 20; 
+                }
+                
+                // 绘制端点（组件侧）
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', startX);
+                circle.setAttribute('cy', startY);
+                circle.setAttribute('r', 4);
+                circle.setAttribute('fill', '#999');
+                svg.appendChild(circle);
+                
+                // 绘制端点（便签侧）
+                const circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle2.setAttribute('cx', endX);
+                circle2.setAttribute('cy', endY);
+                circle2.setAttribute('r', 4);
+                circle2.setAttribute('fill', '#fbc02d');
+                svg.appendChild(circle2);
+
+                // 绘制折线（水平 - 垂直 - 水平）
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const midX = startX + (endX - startX) / 2;
+                const pathData = `M ${startX} ${startY} L ${midX} ${startY} L ${midX} ${endY} L ${endX} ${endY}`;
+                
+                line.setAttribute('d', pathData);
+                line.setAttribute('stroke', '#aaa');
+                line.setAttribute('stroke-width', '1.5');
+                line.setAttribute('stroke-dasharray', '4,4'); // 更密的虚线更适合折线
+                line.setAttribute('fill', 'none');
+                svg.appendChild(line);
+            });
+        }
+        
+        // 组件 ID 悬浮提示逻辑
+        const tooltip = document.getElementById('component-id-tooltip');
+        document.addEventListener('mouseover', (e) => {
+            // 找到最近的带有 data-task-id 或 id 的元素
+            const target = e.target.closest('[data-task-id], [id]');
+            // 排除掉一些系统级别和纯框架的 ID，避免干扰
+            const excludedIds = ['note-lines', 'notes-container-left', 'notes-container-right', 'component-id-tooltip', 'main-frame', 'dynamic-content-area', 'top-navbar', 'nav-pages'];
+            
+            // 如果是在导航栏内部，或者被排除的元素，不显示提示框
+            if (target && !excludedIds.includes(target.id) && !target.closest('.notes-container') && !target.closest('.navbar')) {
+                const taskId = target.getAttribute('data-task-id');
+                const displayId = taskId ? taskId : ('#' + target.id);
+                
+                if (taskId || target.id) {
+                    tooltip.textContent = displayId;
+                    tooltip.style.opacity = '1';
+                    
+                    const rect = target.getBoundingClientRect();
+                    // 显示在元素左上角上方
+                    tooltip.style.left = Math.max(10, rect.left) + 'px';
+                    tooltip.style.top = Math.max(10, rect.top - 28) + 'px';
+                }
+            } else {
+                tooltip.style.opacity = '0';
+            }
+        });
+
+        // 鼠标移出窗口时隐藏 tooltip
+        document.addEventListener('mouseout', (e) => {
+            if (!e.relatedTarget) {
+                tooltip.style.opacity = '0';
+            }
+        });
+        
+        function updateAll() {
+            organizeNotes();
+            drawNoteLines();
+        }
+
+        // 监听各种可能改变布局的事件
+        window.addEventListener('resize', drawNoteLines);
+        window.addEventListener('scroll', drawNoteLines, true);
+        
+        // 在 HTMX 页面切换前，先清理掉旧页面的所有便签，防止不断累积
+        document.body.addEventListener('htmx:beforeSwap', () => {
+            const leftContainer = document.getElementById('notes-container-left');
+            const rightContainer = document.getElementById('notes-container-right');
+            if (leftContainer) leftContainer.innerHTML = '';
+            if (rightContainer) rightContainer.innerHTML = '';
+        });
+        
+        // 在 HTMX 页面切换后，重新收集新页面的便签并连线
+        document.body.addEventListener('htmx:afterSwap', () => setTimeout(updateAll, 50));
+        
+        // 初始化绘制
+        setTimeout(updateAll, 100);
+    </script>
+</body>
+</html>
