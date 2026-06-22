@@ -1,6 +1,11 @@
+---
+name: rapid-mockup
+description: Browser-based rapid prototyping skill for showing mockups, diagrams, and options.
+---
+
 # Visual Companion Guide
 
-Browser-based visual brainstorming companion for showing mockups, diagrams, and options.
+Browser-based rapid prototyping skill for showing mockups, diagrams, and options.
 
 ## When to Use
 
