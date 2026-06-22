@@ -1,5 +1,7 @@
 # AI Frontend Prototype Scaffold
-> AI 原型前端快速脚手架
+> AI 原型前端快速脚手架 (axure_faster_skill)
+
+![UI Preview](./assets/preview.jpg)
 
 这是一个专为 AI 编程助手（如 Claude Code、Gemini 等）量身定制的前端交互原型快速开发脚手架。它的目标是：**以极低的认知负载和零构建配置，帮助 AI 在几秒钟内将业务想法转化为可点击、带状态流转的高保真网页原型。**
 
