@@ -11,17 +11,18 @@
 - `SKILL.md`: 核心！这是写给 AI 智能体看的“系统指令”。里面严格定义了 AI 在生成组件时如何使用 HTMX 进行无刷新路由、如何挂载 `data-task-id` 并在底部编写自动化说明便签。
 - `template/`: 脚手架模板文件夹。当 AI 被要求初始化项目时，它会将这里的 `index.html` 外壳框架、内置好的 Vanilla CSS、路由逻辑以及相关的演示页面一并复制到你的工作区。
 
-## 🚀 如何安装和使用
+## 🚀 针对 Claude Code 的安装和使用指南
 
-如果你使用的是支持自定义技能集的 Agent 系统（如 Antigravity）：
-1. 将此仓库克隆到你工作区的对应技能池中：
+作为目前强大的 CLI 原生智能体，你可以轻松让 **Claude Code** 掌握这个技能：
+
+1. **引入技能配置**：在你的项目工作区中，将本仓库完整克隆下来，或者只将其放在一个特定目录中（如 `.claude/skills/`）：
    ```bash
-   git clone https://github.com/wangchangwei/axure_faster_skill.git .agents/skills/axure_faster_skill
+   git clone https://github.com/wangchangwei/axure_faster_skill.git
    ```
-2. 启动你的 Agent，它将自动识别并加载 `SKILL.md` 的能力。
-3. 对你的 Agent 说：
-   > “请使用 `axure_faster_skill` 帮我初始化一个原型脚手架，并新建一个商品列表页面，列出商品图片、标题和加入购物车按钮。”
-4. Agent 会自动拷贝模板、注册导航、编写带有 `data-task-id` 的组件并连好说明便签！
+2. **唤起 Claude Code**：在终端启动 `claude`。
+3. **下达指令让其学习并执行**：
+   > “请阅读并学习 `axure_faster_skill/SKILL.md` 中的规范。然后帮我初始化一个原型脚手架，并新建一个商品列表页面，列出商品图片、标题和加入购物车按钮。”
+4. **见证奇迹**：Claude Code 会自动根据 SKILL.md 里的0号原则，精准地从 `template/` 目录下将框架拷贝出来，然后编写新的 HTML 文件、配置无刷新路由、分配 `data-task-id`，最后甚至会连好漂亮的说明便签！
 
 ## ✨ 核心特性体验（模板效果）
 
