@@ -15,15 +15,18 @@
 - `component.html`: 示例组件片段，用于展示 HTMX 如何异步拉取外部 HTML 进行局部替换。
 
 ## 快速启动
-在当前目录下启动任意静态文件服务即可：
+在当前目录下启动服务：
 ```bash
-# Python 环境
-python3 -m http.server 8080
+# 使用 npm 快速启动（默认端口 7788）
+npm start
 
-# 或 Node 环境
-npx http-server -p 8080
+# 或手动使用 Python 环境
+python3 -m http.server 7788
+
+# 或使用 Node 环境
+npx http-server -p 7788
 ```
-然后在浏览器访问 `http://localhost:8080`。
+然后在浏览器访问 `http://localhost:7788`。
 
 ## AI 使用指南 (给下一个 Agent 的提示)
 当你被要求基于此脚手架设计原型时，请遵循以下原则：
